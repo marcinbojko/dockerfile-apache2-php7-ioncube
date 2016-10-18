@@ -1,0 +1,1 @@
+docker build -t solution360/apache2-php7-ioncube .

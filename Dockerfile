@@ -1,0 +1,42 @@
+FROM debian:8
+ 
+RUN apt-get update
+RUN apt-get install -y wget curl apt-transport-https apache2 unzip
+
+# add dotdeb to apt sources list
+RUN echo 'deb http://packages.dotdeb.org jessie all' > /etc/apt/sources.list.d/dotdeb.list
+
+## add dotdeb key for apt
+RUN curl http://www.dotdeb.org/dotdeb.gpg | apt-key add -
+
+RUN apt-get update
+
+RUN apt-get install -y php7.0 php7.0-curl php7.0-gd php7.0-mbstring php7.0-imagick php7.0-mysql php7.0-xdebug
+
+RUN service apache2 restart
+
+#configure XDebug
+RUN ["bin/bash", "-c", "echo [XDebug] >> /etc/php/7*/apache2/php.ini"]
+RUN ["bin/bash", "-c", "echo xdebug.remote_enable=1 >> /etc/php/7*/apache2/php.ini"]
+RUN ["bin/bash", "-c", "echo xdebug.remote_connect_back=1 >> /etc/php/7*/apache2/php.ini"]
+RUN ["bin/bash", "-c", "echo xdebug.idekey=netbeans-xdebug >> /etc/php/7*/apache2/php.ini"] 
+
+#install ioncube
+RUN wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz
+RUN tar xvfz ioncube_loaders_lin_x86-64.tar.gz
+RUN ["bin/bash", "-c", "cp ioncube/*.so /usr/lib/php/2*/"]
+RUN ["bin/bash", "-c", "cd /etc/php/7*/apache2/conf.d && echo zend_extension = /usr/lib/php/2*/ioncube_loader_lin_7.0.so > 00-ioncube.ini"]
+RUN service apache2 restart
+
+# Configure apache
+RUN a2enmod rewrite
+RUN a2enmod ssl
+RUN chown -R www-data:www-data /var/www
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+
+EXPOSE 80
+EXPOSE 443
+
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
