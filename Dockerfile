@@ -39,10 +39,15 @@ RUN service apache2 restart
 # Configure apache
 RUN a2enmod rewrite
 RUN a2enmod ssl
+RUN a2enmod proxy
+RUN a2enmod headers
+# enable ssl on apache
+RUN a2ensite default-ssl
 RUN chown -R www-data:www-data /var/www
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOG_DIR /var/log/apache2
+RUN service apache2 restart
 
 EXPOSE 80
 EXPOSE 443
