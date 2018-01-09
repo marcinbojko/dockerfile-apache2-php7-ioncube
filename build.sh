@@ -1,1 +1,1 @@
-docker build -t solution360/apache2-php7-ioncube .
+docker build --no-cache -t solution360/apache2-php7-ioncube .
