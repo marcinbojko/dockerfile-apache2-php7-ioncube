@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  apache-ioncube:
+    image: apache-ioncube:latest
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+
